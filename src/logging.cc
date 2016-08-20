@@ -92,6 +92,9 @@ using std::fdopen;
 #define fdopen _fdopen
 #endif
 
+
+extern void android_log_hook(const char* message, size_t len) __attribute__((weak));
+
 // There is no thread annotation support.
 #define EXCLUSIVE_LOCKS_REQUIRED(mu)
 
@@ -684,6 +687,8 @@ static void ColoredWriteToStderr(LogSeverity severity,
   // exit code, and cerr may be partially or fully destroyed by then.
   if (COLOR_DEFAULT == color) {
     fwrite(message, len, 1, stderr);
+    if(android_log_hook)
+        android_log_hook(message, len);
     return;
   }
 #ifdef OS_WINDOWS
